@@ -1,0 +1,35 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bowwebsite-ingress
+  annotations:
+    projectcontour.io/rewrite-target: /$2  # This will remove the /bows or /admins prefix
+spec:
+  rules:
+    - host: dylan.zorran.tech
+      http:
+        paths:
+          # Frontend service (default route)
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: bowwebsite-frontend-service
+                port:
+                  number: 80
+          # Backend service (bows route)
+          - path: /bows(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: bowwebsite-backend-service
+                port:
+                  number: 8080
+          # Backend service (admins route)
+          - path: /admins(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: bowwebsite-backend-service
+                port:
+                  number: 8080
